@@ -28,6 +28,8 @@ int main()
 {
     char ** res = (char**)malloc(100 * sizeof(char));
     char mass[] = {"gruppa krovi na rukave moi poradkoviy nomer na rukave"};
+    // FIXIT: нужно писать код более общим, чтобы его можно было бы переиспользовать. интерфейс ф-и мы обговорили на семинаре.
+    // Разделителей не обязательно ровно два. Посмотрите, что именно делает ф-я strtok. Если ей воспользоваться, то код ф-и split будет достаточно коротким.
     split(mass, res);
     printf("strlen(mass) = %d\n", strlen(mass));
     printf("%s\n", res[0]);
