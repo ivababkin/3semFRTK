@@ -24,32 +24,50 @@ void split(char * str, char ** resptr)
     }
 }
 
+
+void Split2 (char* string, char* delimeters, char*** tokens, int* tokensCount)//оно портит исходную строку, но так, вроде, можно
+{
+    int count = 0;
+    char * ptrstr;
+    char ** doubleptr = *tokens;
+    ptrstr = strtok (string, delimeters);
+    *doubleptr = ptrstr;
+
+    while (ptrstr != NULL)
+    {
+       (doubleptr)++;
+       ptrstr = strtok (NULL, delimeters);
+       *doubleptr = ptrstr;
+       count++;
+    }
+    *tokensCount = count;
+
+}
+
+
+
 int main()
 {
-    char ** res = (char**)malloc(100 * sizeof(char));
-    char mass[] = {"gruppa krovi na rukave moi poradkoviy nomer na rukave"};
-    // FIXIT: нужно писать код более общим, чтобы его можно было бы переиспользовать. интерфейс ф-и мы обговорили на семинаре.
-    // Разделителей не обязательно ровно два. Посмотрите, что именно делает ф-я strtok. Если ей воспользоваться, то код ф-и split будет достаточно коротким.
-    split(mass, res);
-    printf("strlen(mass) = %d\n", strlen(mass));
-    printf("%s\n", res[0]);
-    printf("%s\n", res[1]);
-    printf("%s\n", res[2]);
-    printf("%s\n", res[3]);
-    printf("%s\n", res[4]);
-    printf("%s\n", res[5]);
-    printf("%s\n", res[6]);
-    printf("%s\n", res[7]);
-    printf("%s\n", res[8]);
-    printf("%s\n", res[9]);
-    printf("%s\n", res[10]);
+    char** tokens = (char**)malloc(100 * sizeof(char));
+    char string[] = {"da_i_chetvertiy-esly-chestno yz smotret by ne stal"};
+    char delimeters[] = {" _-"};
+    int tokensCount = 0;
+    Split2 (string, delimeters, &tokens, &tokensCount);
+    printf ("%d\n", tokensCount);
+    printf("%s\n", (tokens)[0]);
+    printf("%s\n", (tokens)[1]);
+    printf("%s\n", (tokens)[2]);
+    printf("%s\n", (tokens)[3]);
+    printf("%s\n", (tokens)[4]);
+    printf("%s\n", (tokens)[5]);
+    printf("%s\n", (tokens)[6]);
+    printf("%s\n", (tokens)[7]);
+    printf("%s\n", (tokens)[8]);
+    printf("%s\n", (tokens)[9]);
+    printf("%s\n", (tokens)[10]);
 
 
-    for (int i = 0; i <= (strlen(res)); i++)
-    {
-        free(res[i]);
-    }
-    free(res);
+    free((tokens));
 
     return 0;
 }
