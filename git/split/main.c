@@ -24,7 +24,7 @@ void split(char * str, char ** resptr)
     }
 }
 
-
+// Если вы не хотите, чтобы исходная строка string изменилась, то можно сделать копию от неё.
 void Split2 (char* string, char* delimeters, char*** tokens, int* tokensCount)//оно портит исходную строку, но так, вроде, можно
 {
     int count = 0;
@@ -35,8 +35,8 @@ void Split2 (char* string, char* delimeters, char*** tokens, int* tokensCount)//
 
     while (ptrstr != NULL)
     {
-       (doubleptr)++;
-       ptrstr = strtok (NULL, delimeters);
+       doubleptr++;
+       ptrstr = strtok(NULL, delimeters);
        *doubleptr = ptrstr;
        count++;
     }
@@ -44,12 +44,14 @@ void Split2 (char* string, char* delimeters, char*** tokens, int* tokensCount)//
 
 }
 
-
-
 int main()
 {
+    // FIXIT: 1) нужно вынести 100 в именованную константу 2) вывести результат с помощью цикла, а не копированием одной и той же строчки
     char** tokens = (char**)malloc(100 * sizeof(char));
+    
+    // Считывать с экрана строку можно с помощью fgets
     char string[] = {"da_i_chetvertiy-esly-chestno yz smotret by ne stal"};
+    
     char delimeters[] = {" _-"};
     int tokensCount = 0;
     Split2 (string, delimeters, &tokens, &tokensCount);
