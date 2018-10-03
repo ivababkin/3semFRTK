@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#define MANY 100
 
 void split(char * str, char ** resptr)
 {
@@ -25,6 +26,7 @@ void split(char * str, char ** resptr)
 }
 
 // Если вы не хотите, чтобы исходная строка string изменилась, то можно сделать копию от неё.
+//нет, меня все устраивает
 void Split2 (char* string, char* delimeters, char*** tokens, int* tokensCount)//оно портит исходную строку, но так, вроде, можно
 {
     int count = 0;
@@ -46,28 +48,20 @@ void Split2 (char* string, char* delimeters, char*** tokens, int* tokensCount)//
 
 int main()
 {
-    // FIXIT: 1) нужно вынести 100 в именованную константу 2) вывести результат с помощью цикла, а не копированием одной и той же строчки
-    char** tokens = (char**)malloc(100 * sizeof(char));
-    
+    char** tokens = (char**)malloc(MANY * sizeof(char));
+
     // Считывать с экрана строку можно с помощью fgets
     char string[] = {"da_i_chetvertiy-esly-chestno yz smotret by ne stal"};
-    
+
     char delimeters[] = {" _-"};
     int tokensCount = 0;
     Split2 (string, delimeters, &tokens, &tokensCount);
-    printf ("%d\n", tokensCount);
-    printf("%s\n", (tokens)[0]);
-    printf("%s\n", (tokens)[1]);
-    printf("%s\n", (tokens)[2]);
-    printf("%s\n", (tokens)[3]);
-    printf("%s\n", (tokens)[4]);
-    printf("%s\n", (tokens)[5]);
-    printf("%s\n", (tokens)[6]);
-    printf("%s\n", (tokens)[7]);
-    printf("%s\n", (tokens)[8]);
-    printf("%s\n", (tokens)[9]);
-    printf("%s\n", (tokens)[10]);
 
+    for(int k = 0; k < tokensCount; k++)
+    {
+        //printf ("%d\n", tokensCount);
+        printf("%s\n", tokens[k]);
+       }
 
     free((tokens));
 
