@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 
-void Split (char* string, char* delimeters, char*** tokens, int* tokensCount)//оно портит исходную строку, но так, вроде, можно
+void Split (char* string, char* delimeters, char*** tokens, int* tokensCount)
 {
     int count = 0;
     char * ptrstr;
@@ -24,12 +24,12 @@ void Split (char* string, char* delimeters, char*** tokens, int* tokensCount)//�
        count++;
     }
     *tokensCount = count;
-
 }
 
 
 int main(int argc, char* argv[], char* envp[])
 {
+    // FIXIT: числа 2, 10, 20, 30 нужно вынести в именованные константы, из названия которых ясно, зачем они нужны
     pid_t a;
     pid_t pid = 2;
     char delimeters[] = {" "};
@@ -40,6 +40,10 @@ int main(int argc, char* argv[], char* envp[])
     {
         mass[i] = malloc(20 * sizeof(char));
     }
+    
+    // FIXIT: полный путь до файла со списком команд в коде быть не должно.
+    // Можете задать путь до файла с командами через аргументы командной строки:
+    // https://stackoverflow.com/questions/1593288/qtcreator-and-command-line-arguments
     FILE * f = fopen("/home/ivan/Рабочий стол/фртк/visokosny/umnozhenie/forklesson/text", "r");
 
 
@@ -49,16 +53,16 @@ int main(int argc, char* argv[], char* envp[])
     }
 
 
-
+    // FIXIT: число команд для запуска нужно из файла со списком команд взять. "хардкодить" не нужно.
     for(int i = 0; i < 5; i++)
     {
-
         if (pid == 0)
         {
-            printf("perent of child %d\n", getppid());
+            printf("parent of child %d\n", getppid());
             printf("    child %d\n", getpid());
             char** tokens = (char**)calloc(10, sizeof(char*));
             int tokensCount = 0;
+            // Почему i - 1? От нуля же i идет...
             Split (mass[i - 1], delimeters, &tokens, &tokensCount);
             //printf ("%d\n", tokensCount);
             printf("tokens[0] = %s\n", tokens[0]);
@@ -71,6 +75,9 @@ int main(int argc, char* argv[], char* envp[])
         }
         else
         {
+            // Если не разберетесь, то на семинаре проговорим, что именно требуется сделать, чтобы "убивать" всех дольше timeout'а.
+            // Эту ветку else'а можно пока закомментировать совсем. Пока добейтесь, чтобы ветка if (pid == 0) работала корректно. 
+            
             //signal (SIGALRM, printf("F\n"));
             //alarm (10);
             sleep(1);
