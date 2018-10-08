@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+// FIXIT: из названия констант должно быть ясно её предназначение, хотя бы примерно
+// MAX_STRING_SIZE лучше
 #define MANY 100
 
 void split(char * str, char ** resptr)
@@ -25,9 +28,7 @@ void split(char * str, char ** resptr)
     }
 }
 
-// Если вы не хотите, чтобы исходная строка string изменилась, то можно сделать копию от неё.
-//нет, меня все устраивает
-void Split2 (char* string, char* delimeters, char*** tokens, int* tokensCount)//оно портит исходную строку, но так, вроде, можно
+void Split2 (char* string, char* delimeters, char*** tokens, int* tokensCount)
 {
     int count = 0;
     char * ptrstr;
@@ -43,7 +44,6 @@ void Split2 (char* string, char* delimeters, char*** tokens, int* tokensCount)//
        count++;
     }
     *tokensCount = count;
-
 }
 
 int main()
@@ -63,7 +63,7 @@ int main()
         printf("%s\n", tokens[k]);
        }
 
-    free((tokens));
+    free(tokens);
 
     return 0;
 }
