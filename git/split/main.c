@@ -4,7 +4,7 @@
 
 // FIXIT: из названия констант должно быть ясно её предназначение, хотя бы примерно
 // MAX_STRING_SIZE лучше
-#define MANY 100
+#define MAX_STRING_SIZE 100
 
 void split(char * str, char ** resptr)
 {
@@ -48,7 +48,7 @@ void Split2 (char* string, char* delimeters, char*** tokens, int* tokensCount)
 
 int main()
 {
-    char** tokens = (char**)malloc(MANY * sizeof(char));
+    char** tokens = (char**)malloc(MAX_STRING_SIZE * sizeof(char));
 
     // Считывать с экрана строку можно с помощью fgets
     char string[] = {"da_i_chetvertiy-esly-chestno yz smotret by ne stal"};
