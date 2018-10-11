@@ -6,9 +6,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#define numberofwords 20
+#define lengthofwords 20
 
 
-void Split (char* string, char* delimeters, char*** tokens, int* tokensCount)
+void Split (char* string, char* delimeters, char*** tokens, int* tokensCount)//оно портит исходную строку, но так, вроде, можно
 {
     int count = 0;
     char * ptrstr;
@@ -23,61 +25,69 @@ void Split (char* string, char* delimeters, char*** tokens, int* tokensCount)
        *doubleptr = ptrstr;
        count++;
     }
+    doubleptr++;
+    doubleptr = NULL;
     *tokensCount = count;
+
 }
 
 
 int main(int argc, char* argv[], char* envp[])
 {
-    // FIXIT: числа 2, 10, 20, 30 нужно вынести в именованные константы, из названия которых ясно, зачем они нужны
     pid_t a;
     pid_t pid = 2;
-    char delimeters[] = {" "};
 
-    char ** mass[10];
+    char delimeters[] = {" '\n'"};
 
-    for (int i = 0; i < 10; i++)
-    {
-        mass[i] = malloc(20 * sizeof(char));
-    }
-    
-    // FIXIT: полный путь до файла со списком команд в коде быть не должно.
-    // Можете задать путь до файла с командами через аргументы командной строки:
-    // https://stackoverflow.com/questions/1593288/qtcreator-and-command-line-arguments
-    FILE * f = fopen("/home/ivan/Рабочий стол/фртк/visokosny/umnozhenie/forklesson/text", "r");
+
+    char ** mass;
+    mass = (char**)calloc(numberofwords, sizeof(char *));
 
 
     for (int i = 0; i < 10; i++)
     {
-        fgets(mass[i], 30, f);
+        mass[i] = malloc(lengthofwords * sizeof(char));
+    }
+
+    FILE * f = fopen("/home/ivan/Рабочий стол/фртк/all/forkprog/text", "r");
+
+    int numberofstrings = 0;
+    fscanf(f, "%d\n", &numberofstrings);
+
+    printf("===%d===\n", numberofstrings);
+
+    for (int i = 0; i < numberofwords; i++)
+    {
+        fgets(mass[i], lengthofwords, f);
     }
 
 
-    // FIXIT: число команд для запуска нужно из файла со списком команд взять. "хардкодить" не нужно.
-    for(int i = 0; i < 5; i++)
+
+    for(int i = 0; i < (numberofstrings); i++)
     {
+
         if (pid == 0)
         {
-            printf("parent of child %d\n", getppid());
+            printf("perent of child %d\n", getppid());
             printf("    child %d\n", getpid());
             char** tokens = (char**)calloc(10, sizeof(char*));
             int tokensCount = 0;
-            // Почему i - 1? От нуля же i идет...
             Split (mass[i - 1], delimeters, &tokens, &tokensCount);
             //printf ("%d\n", tokensCount);
             printf("tokens[0] = %s\n", tokens[0]);
             printf("tokens[1] = %s\n", tokens[1]);
+            printf("tokens[2] = %s\n", tokens[2]);
+            printf("tokens[3] = %s\n", tokens[3]);
+
             //printf("%s\n", tokens[3]);
             printf ("--------------------------------------\n");
-            //execvp(tokens[0],tokens);
-            //printf("EXECVP FAILED\n");
+            //tokens[2] = NULL;
+            execvp(tokens[0],tokens);
+            printf("EXECVP FAILED\n");
             exit(0);
         }
         else
         {
-            // Если не разберетесь, то на семинаре проговорим, что именно требуется сделать, чтобы "убивать" всех дольше timeout'а.
-            // Эту ветку else'а можно пока закомментировать совсем. Пока добейтесь, чтобы ветка if (pid == 0) работала корректно. 
-            
             //signal (SIGALRM, printf("F\n"));
             //alarm (10);
             sleep(1);
