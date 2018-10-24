@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+// FIXIT: называйте, пожалуйста, константы, объявленные с помощью define в таком стиле: NUMBER_OF_WORDS 
 #define numberofwords 20
 #define lengthofwords 20
 
@@ -28,7 +30,6 @@ void Split (char* string, char* delimeters, char*** tokens, int* tokensCount)//�
     doubleptr++;
     doubleptr = NULL;
     *tokensCount = count;
-
 }
 
 
@@ -49,7 +50,7 @@ int main(int argc, char* argv[], char* envp[])
         mass[i] = malloc(lengthofwords * sizeof(char));
     }
 
-    FILE * f = fopen("/home/ivan/Рабочий стол/фртк/all/forkprog/text", "r");
+    FILE* f = fopen("/home/ivan/Рабочий стол/фртк/all/forkprog/text", "r");
 
     int numberofstrings = 0;
     fscanf(f, "%d\n", &numberofstrings);
@@ -63,9 +64,8 @@ int main(int argc, char* argv[], char* envp[])
 
 
 
-    for(int i = 0; i < (numberofstrings); i++)
+    for(int i = 0; i < numberofstrings; i++)
     {
-
         if (pid == 0)
         {
             printf("perent of child %d\n", getppid());
@@ -90,6 +90,14 @@ int main(int argc, char* argv[], char* envp[])
         {
             //signal (SIGALRM, printf("F\n"));
             //alarm (10);
+            
+            // FIXIT: на текущий момент ваш код не соответствует условию задачи ... для каждой команды указано, через сколько сек её надо
+            // запустить и какой time limit для программ, т.е. входной файл выглядит примерной так:
+            // 3 5
+            // 2 ls -al
+            // 1 pwd
+            // 3 ./hello_world
+            // Причем, если, например, последняя программа зависла, то её через 5 сек нужно убить
             sleep(1);
             if (i != 0)
                 kill(pid, 1);
