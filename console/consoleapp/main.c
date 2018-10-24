@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#define BUF 50
 
 // FIXIT: 1) нужно убрать закомментированный код, если не нет необходимости
 // Но он видимо все-таки нужен, чтобы в первый раз создать файлы для fifo.
@@ -38,10 +39,10 @@ int main()
     char    resstring[14];
     char    name1[] = "aaa.fifo";
     char    name2[] = "bbb.fifo";
-    int i, k;
+    int numberofconsole, k;
     printf("choose '1' or '2'");
-    scanf("%d", &i);
-    char * str = (char*)calloc(50, sizeof(char));
+    scanf("%d", &numberofconsole);
+    char * str = (char*)calloc(BUF, sizeof(char));
     pid_t pid = -1;
 
 
@@ -62,12 +63,12 @@ int main()
     printf("k = %d\n", k);
 */
 
-    printf("i = %d\n", i);
+    printf("numberofconsole = %d\n", numberofconsole);
 
 
 
     size = 1;
-    if (i == 1)// ////////////////////////
+    if (i == numberofconsole)// ////////////////////////
     {
         pid = fork();
 
@@ -77,7 +78,7 @@ int main()
             fd2 = open(name2, O_RDONLY);
             while(1)
             {
-                size = read(fd2, str, 50);
+                size = read(fd2, str, BUF);
                 if (size < 0)
                 {
                     printf("O NEET");
@@ -95,14 +96,14 @@ int main()
             while(1)
             {
                 scanf("%s", str);
-                size = write(fd1, str, 50);
+                size = write(fd1, str, BUF);
                 if(strcmp(str, "kill") == 0)
                     exit(0);
             }
         }
     }
 
-    if (i == 2)// /////////////////////////////////
+    if (i == numberofconsole)// /////////////////////////////////
     {
         pid = fork();
 
@@ -112,7 +113,7 @@ int main()
             fd1 = open(name1, O_RDONLY);
             while(1)
             {
-                size = read(fd1, str, 50);
+                size = read(fd1, str, BUF);
                 if(size < 0)
                 {
                     printf("O NEEET");
