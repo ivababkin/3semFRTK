@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <time.h>
 
-#define MNOGO 1000
+#define MNOGO 100000000
 
 struct OnePart
 {
@@ -31,11 +32,12 @@ void *mythread(void *dummy)
 
     part.sum = summ;
 
-    printf("==part.begin = %d\n", part.begin);
-    printf("==part.end = %d\n", part.end);
-    printf("==part.data = %d\n", part.data);
-    printf("==part.sum = %d\n", part.sum);
+    //printf("==part.begin = %d\n", part.begin);
+    //printf("==part.end = %d\n", part.end);
+    //printf("==part.data = %d\n", part.data);
+    //printf("==part.sum = %d\n", part.sum);
 
+    //printf("==part.end - part.begin = %d\n", part.end - part.begin);
     *(onepart*)dummy = part;
     return NULL;
 }
@@ -53,11 +55,11 @@ void *mythreadcountdispersia(void *dummy)
         part.dispersia = (float)((part.data[i] - part.middle) * (part.data[i] - part.middle)) / (float)(part.end - part.begin + 1);
     }
 
-    printf("==part.begin = %d\n", part.begin);
-    printf("==part.end = %d\n", part.end);
-    printf("==part.data = %d\n", part.data);
-    printf("==part.sum = %d\n", part.sum);
-    printf("==part.dispersia = %f\n", part.dispersia);
+    //printf("==part.begin = %d\n", part.begin);
+    //printf("==part.end = %d\n", part.end);
+    //printf("==part.data = %d\n", part.data);
+    //printf("==part.sum = %d\n", part.sum);
+    //printf("==part.dispersia = %f\n", part.dispersia);
 
     *(onepart*)dummy = part;
     return NULL;
@@ -75,7 +77,7 @@ int main()
     for (int i = 0; i < MNOGO; i++)
     {
         mass[i] = -10 + rand()%20;
-        printf("%d  ", mass[i]);
+        //printf("%d  ", mass[i]);
     }
     printf("\n");
 
@@ -97,12 +99,17 @@ int main()
 
     pthread_t * thids = malloc(numberofthr * sizeof(pthread_t));
 
+
+    clock_t begin = clock();
+
     for (int i = 0; i < numberofthr; i++)
     {
         int res = pthread_create( &thids[i], (pthread_attr_t *)NULL, mythread, &parts[i]);
     }
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 
-
+    printf("time_spent = %lf", time_spent * 1000);
 
     for (int i = 0; i < numberofthr; i++)
     {
@@ -111,13 +118,13 @@ int main()
 
 
 
-    for (int i = 0; i < numberofthr; i++)
+    /*for (int i = 0; i < numberofthr; i++)
     {
         printf("parts[%d].begin = %d\n", i, parts[i].begin);
         printf("parts[%d].end = %d\n", i, parts[i].end);
         printf("parts[%d].data = %d\n", i, parts[i].data);
         printf("parts[%d].sum = %d\n", i, parts[i].sum);
-    }
+    }*/
 
     for (int i = 0; i < numberofthr; i++)
     {
@@ -126,8 +133,8 @@ int main()
     middle = sum / MNOGO;
 
     printf("\n");
-    printf("sum = %f\n", sum);
-    printf("middle = %f\n", middle);
+    //printf("sum = %f\n", sum);
+    //printf("middle = %f\n", middle);
 
     for (int i = 0; i < numberofthr; i++)
     {
@@ -156,74 +163,22 @@ int main()
     return 0;
 }
 
+/*int msec = 0, trigger = 10;
+clock_t before = clock();
+
+do {
+
+    Do something to busy the CPU just here while you drink a coffee
+    Be sure this code will not take more than `trigger` ms
 
 
+  clock_t difference = clock() - before;
+  msec = difference * 1000 / CLOCKS_PER_SEC;
+  iterations++;
+} while ( msec < trigger );
 
-
-
-/*#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-int mass[3] = {0, 0, 0};
-
-void *mythread(void *dummy)
-
-{
-
-    pthread_t mythid;
-
-    mythid = pthread_self();
-
-    int *i = (int*)dummy;
-
-    for(int j = 0; j < 10000000; j++)
-    {
-        mass[*i]++;
-    }
-
-    for(int j = 0; j < 10000000; j++)
-    {
-        mass[*i + 1]++;
-    }
-
-
-
-   return NULL;
-}
-
-int main()
-{
-   pthread_t thid1, thid2, mythid;
-   int       result;
-
-   int a;
-   int b;
-
-   a = 0;
-   b = 1;
-
-   result = pthread_create( &thid1, (pthread_attr_t *)NULL, mythread, &a);
-
-
-   printf("Thread created, thid = %lu\n", thid1);
-
-   result = pthread_create( &thid2, (pthread_attr_t *)NULL, mythread, &b);
-
-
-   printf("Thread created, thid = %lu\n", thid2);
-
-   mythid = pthread_self();
-
-
-
-   pthread_join(thid1, (void **)NULL);
-   pthread_join(thid2, (void **)NULL);
-   printf("mass[0] = %d\n", mass[0]);
-   printf("mass[1] = %d\n", mass[1]);
-   printf("mass[2] = %d\n", mass[2]);
-
-
-   return 0;
-}
+printf("Time taken %d seconds %d milliseconds (%d iterations)\n",
+  msec/1000, msec%1000, iterations);
 */
+
+
