@@ -3,27 +3,33 @@
 #include <pthread.h>
 #include <time.h>
 
+// FIXIT: не следует использовать транслит
 #define MNOGO 100000000
 
 struct OnePart
 {
-    int * data;
+    int* data;
     int begin;
     int end;
     int sum;
-    int middle;
-    float dispersia;
+    int middle; // average
+    float dispersia; // dispersion
 };
 
+// FIXIT: Нужно было не менять название структуры: typedef struct OnePart OnePart;
+// Т.к. называть структуры нужно везде по коду единообразно.
 typedef struct OnePart onepart;
 
 void *mythread(void *dummy)
 {
+    // FIXIT: неиспользуемая переменная
     pthread_t mythid = pthread_self();
 
     onepart part;
+    // FIXIT: если вы используете переменную, переданную в ф-ю, то её уже стоит переименовать из dummy в нечто более подходящее по смыслу
     part = *(onepart*)dummy;
 
+    // FIXIT: почуму summ? чем sum не подошло?
     int summ = 0;
     for (int i = part.begin; i <= part.end; i++)
     {
@@ -81,12 +87,14 @@ int main()
     }
     printf("\n");
 
+    // FIXIT: Называйте переменные в таком стиле, чтобы отделять слова друг от друга: numberOfThreads, lengthOfOnePart
     int numberofthr = 0;
 
     printf("input numberofthreads\n");
     scanf("%d", &numberofthr);
 
     onepart * parts = malloc(numberofthr * sizeof(onepart));
+    
     int lengthofonepart =MNOGO/numberofthr;
 
     for (int i = 0; i < numberofthr; i++)
@@ -116,6 +124,7 @@ int main()
         pthread_join(thids[i], (void **)NULL);
     }
 
+    // Нужно после join перенести завершение работы таймеры. Плюс в рассылку я писал, что нужно отличать wall-clock time от суммарного user+system time
 
 
     /*for (int i = 0; i < numberofthr; i++)
@@ -155,6 +164,8 @@ int main()
 
     for (int i = 0; i < numberofthr; i++)
     {
+        // Кажется, что у вас ф-ла для вычисления дисперсии неверная. Нужно поделить на число общее элементов уже после суммирования.
+        // Сейчас для разного числа нитей и одних и тех же входных данных будет разный ответ.
         sumdispersia = sumdispersia + parts[i].dispersia;
     }
 
