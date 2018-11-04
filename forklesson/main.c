@@ -45,11 +45,13 @@ int main(int argc, char* argv[], char* envp[])
     mass = (char**)calloc(numberofwords, sizeof(char *));
 
 
+    // FIXIT: нужно число 10 вынести в именованную константу
     for (int i = 0; i < 10; i++)
     {
         mass[i] = malloc(lengthofwords * sizeof(char));
     }
 
+    // FIXIT: если в коде нужно получить путь до некоторого файла, его нужно передавать через аргументы командной строки
     FILE* f = fopen("/home/ivan/Рабочий стол/фртк/all/forkprog/text", "r");
 
     int numberofstrings = 0;
@@ -102,6 +104,7 @@ int main(int argc, char* argv[], char* envp[])
             if (i != 0)
                 kill(pid, 1);
 
+            // Неясно, почему fork выполняете здесь, а не перед if (pid == 0) 
             pid = fork();
             //wait(&a);
         }
