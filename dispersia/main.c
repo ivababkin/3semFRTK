@@ -3,71 +3,51 @@
 #include <pthread.h>
 #include <time.h>
 
-// FIXIT: не следует использовать транслит
-#define MNOGO 100000000
+#define DIGITS 100000000
 
 struct OnePart
 {
-    int* data;
+    int * data;
     int begin;
     int end;
     int sum;
-    int middle; // average
-    float dispersia; // dispersion
+    int average;
+    float dispersion;//не деленная на количество элементов
 };
 
-// FIXIT: Нужно было не менять название структуры: typedef struct OnePart OnePart;
-// Т.к. называть структуры нужно везде по коду единообразно.
-typedef struct OnePart onepart;
+typedef struct OnePart OnePart;
 
-void *mythread(void *dummy)
-{
-    // FIXIT: неиспользуемая переменная
-    pthread_t mythid = pthread_self();
+void *ThreadCountAverage(void *AcceptedPart)
+{    
+    OnePart ThisPart;
+    ThisPart = *(OnePart*)AcceptedPart;
 
-    onepart part;
-    // FIXIT: если вы используете переменную, переданную в ф-ю, то её уже стоит переименовать из dummy в нечто более подходящее по смыслу
-    part = *(onepart*)dummy;
-
-    // FIXIT: почуму summ? чем sum не подошло?
-    int summ = 0;
-    for (int i = part.begin; i <= part.end; i++)
+    int sum = 0;
+    for (int i = ThisPart.begin; i <= ThisPart.end; i++)
     {
-        summ = summ + part.data[i];
+        sum = sum + ThisPart.data[i];
     }
 
-    part.sum = summ;
+    ThisPart.sum = sum;
 
-    //printf("==part.begin = %d\n", part.begin);
-    //printf("==part.end = %d\n", part.end);
-    //printf("==part.data = %d\n", part.data);
-    //printf("==part.sum = %d\n", part.sum);
-
-    //printf("==part.end - part.begin = %d\n", part.end - part.begin);
-    *(onepart*)dummy = part;
+    *(OnePart*)AcceptedPart = ThisPart;
     return NULL;
 }
 
-void *mythreadcountdispersia(void *dummy)
+void *MyThreadCountDispersion(void *AcceptedPart)
 {
     pthread_t mythid = pthread_self();
 
-    onepart part;
-    part = *(onepart*)dummy;
+    OnePart ThisPart;
+    ThisPart = *(OnePart*)AcceptedPart;
 
-    int dispersia = 0;
-    for (int i = part.begin; i <= part.end; i++)
+    int dispersion = 0;
+    for (int i = ThisPart.begin; i <= ThisPart.end; i++)
     {
-        part.dispersia = (float)((part.data[i] - part.middle) * (part.data[i] - part.middle)) / (float)(part.end - part.begin + 1);
+        ThisPart.dispersion = ThisPart.dispersion + (float)((ThisPart.data[i] - ThisPart.average) * (ThisPart.data[i] - ThisPart.average));
     }
 
-    //printf("==part.begin = %d\n", part.begin);
-    //printf("==part.end = %d\n", part.end);
-    //printf("==part.data = %d\n", part.data);
-    //printf("==part.sum = %d\n", part.sum);
-    //printf("==part.dispersia = %f\n", part.dispersia);
-
-    *(onepart*)dummy = part;
+    *(OnePart*)AcceptedPart = ThisPart;
     return NULL;
 }
 
@@ -76,120 +56,91 @@ void *mythreadcountdispersia(void *dummy)
 
 int main()
 {
-    float middle = 0;
+    float average = 0;
     float sum = 0;
 
-    int * mass = (int*) malloc(MNOGO * sizeof(int));
-    for (int i = 0; i < MNOGO; i++)
+    int * mass = (int*) malloc(DIGITS * sizeof(int));
+    for (int i = 0; i < DIGITS; i++)
     {
-        mass[i] = -10 + rand()%20;
+        mass[i] = -1000 + rand()%2000;
         //printf("%d  ", mass[i]);
     }
     printf("\n");
 
-    // FIXIT: Называйте переменные в таком стиле, чтобы отделять слова друг от друга: numberOfThreads, lengthOfOnePart
-    int numberofthr = 0;
+    int NumberOfThr = 0;
 
-    printf("input numberofthreads\n");
-    scanf("%d", &numberofthr);
+    printf("input number of threads\n");
+    scanf("%d", &NumberOfThr);
 
-    onepart * parts = malloc(numberofthr * sizeof(onepart));
-    
-    int lengthofonepart =MNOGO/numberofthr;
+    OnePart * Parts = malloc(NumberOfThr * sizeof(OnePart));
+    int LengthOfOnePart =DIGITS/NumberOfThr;
 
-    for (int i = 0; i < numberofthr; i++)
+    for (int i = 0; i < NumberOfThr; i++)
     {
-        parts[i].begin = i * lengthofonepart;
-        parts[i].end = (i + 1) * lengthofonepart - 1;
-        parts[i].data = mass;
+        Parts[i].begin = i * LengthOfOnePart;
+        Parts[i].end = (i + 1) * LengthOfOnePart - 1;
+        Parts[i].data = mass;
     }
-    parts[numberofthr - 1].end = MNOGO - 1;
+    Parts[NumberOfThr - 1].end = DIGITS - 1;
 
-    pthread_t * thids = malloc(numberofthr * sizeof(pthread_t));
+    pthread_t * thids = malloc(NumberOfThr * sizeof(pthread_t));
 
 
     clock_t begin = clock();
 
-    for (int i = 0; i < numberofthr; i++)
+    for (int i = 0; i < NumberOfThr; i++)
     {
-        int res = pthread_create( &thids[i], (pthread_attr_t *)NULL, mythread, &parts[i]);
+        int res = pthread_create( &thids[i], (pthread_attr_t *)NULL, ThreadCountAverage, &Parts[i]);
     }
+
+    printf("thread");
+
+    for (int i = 0; i < NumberOfThr; i++)
+    {
+        pthread_join(thids[i], (void **)NULL);
+    }
+
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 
     printf("time_spent = %lf", time_spent * 1000);
 
-    for (int i = 0; i < numberofthr; i++)
+
+    for (int i = 0; i < NumberOfThr; i++)
     {
-        pthread_join(thids[i], (void **)NULL);
+        sum = sum + Parts[i].sum;
     }
-
-    // Нужно после join перенести завершение работы таймеры. Плюс в рассылку я писал, что нужно отличать wall-clock time от суммарного user+system time
-
-
-    /*for (int i = 0; i < numberofthr; i++)
-    {
-        printf("parts[%d].begin = %d\n", i, parts[i].begin);
-        printf("parts[%d].end = %d\n", i, parts[i].end);
-        printf("parts[%d].data = %d\n", i, parts[i].data);
-        printf("parts[%d].sum = %d\n", i, parts[i].sum);
-    }*/
-
-    for (int i = 0; i < numberofthr; i++)
-    {
-        sum = sum + parts[i].sum;
-    }
-    middle = sum / MNOGO;
+    average = sum / DIGITS;
 
     printf("\n");
-    //printf("sum = %f\n", sum);
-    //printf("middle = %f\n", middle);
 
-    for (int i = 0; i < numberofthr; i++)
+    for (int i = 0; i < NumberOfThr; i++)
     {
-        parts[i].middle = middle;
+        Parts[i].average = average;
     }
 
-    float sumdispersia = 0;
+    float sumdispersion = 0;
 
-    for (int i = 0; i < numberofthr; i++)
+    for (int i = 0; i < NumberOfThr; i++)
     {
-        int res = pthread_create( &thids[i], (pthread_attr_t *)NULL, mythreadcountdispersia, &parts[i]);
+        int res = pthread_create( &thids[i], (pthread_attr_t *)NULL, MyThreadCountDispersion, &Parts[i]);
     }
 
-    for (int i = 0; i < numberofthr; i++)
+    for (int i = 0; i < NumberOfThr; i++)
     {
         pthread_join(thids[i], (void **)NULL);
     }
 
-    for (int i = 0; i < numberofthr; i++)
+    for (int i = 0; i < NumberOfThr; i++)
     {
-        // Кажется, что у вас ф-ла для вычисления дисперсии неверная. Нужно поделить на число общее элементов уже после суммирования.
-        // Сейчас для разного числа нитей и одних и тех же входных данных будет разный ответ.
-        sumdispersia = sumdispersia + parts[i].dispersia;
+        sumdispersion = sumdispersion + Parts[i].dispersion;
     }
 
-    printf("          sumdispersia = %f", sumdispersia);
+    sumdispersion = sumdispersion / DIGITS;
 
+    printf("          sumdispersion = %f", sumdispersion);
+    printf("          average = %f\n", average);
+
+    free(mass);
     return 0;
 }
-
-/*int msec = 0, trigger = 10;
-clock_t before = clock();
-
-do {
-
-    Do something to busy the CPU just here while you drink a coffee
-    Be sure this code will not take more than `trigger` ms
-
-
-  clock_t difference = clock() - before;
-  msec = difference * 1000 / CLOCKS_PER_SEC;
-  iterations++;
-} while ( msec < trigger );
-
-printf("Time taken %d seconds %d milliseconds (%d iterations)\n",
-  msec/1000, msec%1000, iterations);
-*/
-
-
