@@ -4,45 +4,14 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define BUF 50
+#define SIZE_OF_MESSAGE 50
 
-// FIXIT: 1) нужно убрать закомментированный код, если не нет необходимости
-// Но он видимо все-таки нужен, чтобы в первый раз создать файлы для fifo.
-// Вы можете посмотреть сразу после вызова mknod, какая ошибка там указана.
-// И если ошибка из-за того, что файл уже существует на диске, то продолжить работу
-// 2) дублирующиеся куски кода нужно вынести в отдельные ф-и
-// Я про ... и второй для записи в fifo
-/*
-            fd2 = open(name2, O_RDONLY);
-            while(1)
-            {
-                size = read(fd2, str, 50);
-                if (size < 0)
-                {
-                    printf("O NEET");
-                }
-                printf("2: ");
-                puts(str);
-                if(strcmp(str, "kill") == 0)
-                    exit(0);
-
-            }
-*/
-// 3) 50 в отдельную константу
-// 4) удостоверьтесь, что из названия всех переменных ясно их предназначение ... для i, например, точно не ясно
-
-
-/* FIXIT:
-1) Из названия BUF неясно предназначение этой константы
-2) Остался закомментированный код
-3) Дублирование основной части код if (i == numberofconsole) { ... } осталось
-*/
 
 int main()
 {
     int     fd1, fd2, result;
 
-    size_t  size = 0;
+    size_t  size = 0; //size of written or 
     char    resstring[14];
     char    name1[] = "aaa.fifo";
     char    name2[] = "bbb.fifo";
@@ -85,7 +54,7 @@ int main()
             fd2 = open(name2, O_RDONLY);
             while(1)
             {
-                size = read(fd2, str, BUF);
+                size = read(fd2, str, SIZE_OF_MESSAGE);
                 if (size < 0)
                 {
                     printf("O NEET");
@@ -103,7 +72,7 @@ int main()
             while(1)
             {
                 scanf("%s", str);
-                size = write(fd1, str, BUF);
+                size = write(fd1, str, SIZE_OF_MESSAGE);
                 if(strcmp(str, "kill") == 0)
                     exit(0);
             }
@@ -120,7 +89,7 @@ int main()
             fd1 = open(name1, O_RDONLY);
             while(1)
             {
-                size = read(fd1, str, BUF);
+                size = read(fd1, str, SIZE_OF_MESSAGE);
                 if(size < 0)
                 {
                     printf("O NEEET");
@@ -137,7 +106,7 @@ int main()
             while (1)
             {
                 scanf("%s", str);
-                size = write(fd2, str, 50);
+                size = write(fd2, str, SIZE_OF_MESSAGE);
                 if(strcmp(str, "kill") == 0)
                     exit(0);
             }
