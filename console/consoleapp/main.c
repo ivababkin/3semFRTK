@@ -4,20 +4,20 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define SIZE_OF_MESSAGE 50
-
+#include <string.h>
+#define BUF 50
 
 int main()
 {
     int     fd1, fd2, result;
 
-    size_t  size = 0; //size of written or 
+    size_t  size = 0;
     char    resstring[14];
     char    name1[] = "aaa.fifo";
     char    name2[] = "bbb.fifo";
-    int numberofconsole, k;
-    printf("choose '1' or '2'");
-    scanf("%d", &numberofconsole);
+    int numberOfConsole, k;
+    printf("choose numberOfConsole '1' or '2'");
+    scanf("%d", &numberOfConsole);
     char * str = (char*)calloc(BUF, sizeof(char));
     pid_t pid = -1;
 
@@ -39,12 +39,11 @@ int main()
     printf("k = %d\n", k);
 */
 
-    printf("numberofconsole = %d\n", numberofconsole);
+    printf("numberOfConsole = %d\n", numberOfConsole);
 
 
 
-    size = 1;
-    if (i == numberofconsole)// ////////////////////////
+    if (numberOfConsole == 1)// ////////////////////////
     {
         pid = fork();
 
@@ -54,15 +53,13 @@ int main()
             fd2 = open(name2, O_RDONLY);
             while(1)
             {
-                size = read(fd2, str, SIZE_OF_MESSAGE);
+                read(fd2, str, BUF);
                 if (size < 0)
                 {
                     printf("O NEET");
                 }
                 printf("2: ");
                 puts(str);
-                if(strcmp(str, "kill") == 0)
-                    exit(0);
 
             }
         }
@@ -72,14 +69,12 @@ int main()
             while(1)
             {
                 scanf("%s", str);
-                size = write(fd1, str, SIZE_OF_MESSAGE);
-                if(strcmp(str, "kill") == 0)
-                    exit(0);
+                write(fd1, str, BUF);
             }
         }
     }
 
-    if (i == numberofconsole)// /////////////////////////////////
+    if (numberOfConsole == 2)// /////////////////////////////////
     {
         pid = fork();
 
@@ -89,15 +84,14 @@ int main()
             fd1 = open(name1, O_RDONLY);
             while(1)
             {
-                size = read(fd1, str, SIZE_OF_MESSAGE);
+                size = read(fd1, str, BUF);
                 if(size < 0)
                 {
                     printf("O NEEET");
                 }
                 printf("1: ");
                 puts(str);
-                if(strcmp(str, "kill") == 0)
-                    exit(0);
+
             }
         }
         else
@@ -106,9 +100,7 @@ int main()
             while (1)
             {
                 scanf("%s", str);
-                size = write(fd2, str, SIZE_OF_MESSAGE);
-                if(strcmp(str, "kill") == 0)
-                    exit(0);
+                write(fd2, str, BUF);
             }
         }
     }
