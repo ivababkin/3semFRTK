@@ -9,16 +9,15 @@
 #include <sys/shm.h>
 #include <sys/sem.h>
 
-#define TABLE_LIMIT 3
-#define MAX_NUMBER_OF_TYPES 4
+#define TABLE_LIMIT 2
 #define MAX_LENGTH_OF_TYPE 10
 #define MAX_LENGTH_OF_STRING 15
-#define MAX_NUMBER_OF_THINGS 11
 #define BUF 20
 
 typedef struct Thing thing;
 
-
+int MaxNumberOfTypes = 10;
+int MaxNumberOfThings = 20;
 
 
 struct Thing
@@ -72,10 +71,10 @@ thing * cleateMassOfThingsAndFillTimesOfCleaning()
 {
     char sep[2] = " ";
     FILE * fTimesOfCleaning = fopen("/home/ivan/Рабочий стол/фртк/all/Table/Table/timesofcleaning", "r");
-    thing * massOfThings = malloc(MAX_NUMBER_OF_TYPES * sizeof(thing));
+    thing * massOfThings = malloc(MaxNumberOfTypes * sizeof(thing));
 
 
-    for(int i = 0; i < MAX_NUMBER_OF_TYPES; i++)
+    for(int i = 0; i < MaxNumberOfTypes; i++)
     {
         char * strtemp = malloc(MAX_LENGTH_OF_STRING * sizeof(char));
         fgets(strtemp, MAX_LENGTH_OF_STRING, fTimesOfCleaning);
@@ -91,7 +90,7 @@ thing * cleateMassOfThingsAndFillTimesOfCleaning()
 
 void deleteMassToClean(char ** massOfThings)
 {
-    /*for(int i = 0; i < MAX_NUMBER_OF_THINGS; i++)
+    /*for(int i = 0; i < MaxNumberOfThings; i++)
     {
         printf("deletemass[%d] = %s\n", i, massOfThings[i]);
         if(massOfThings[i] != NULL)
@@ -107,13 +106,13 @@ void FillTimesOfDrying(thing * massOfThings)
     FILE * fTimesOfDrying = fopen("/home/ivan/Рабочий стол/фртк/all/Table/Table/timesofdrying", "r");
 
     char strtemp[MAX_LENGTH_OF_STRING];
-    for(int i = 0; i < MAX_NUMBER_OF_TYPES; i++)
+    for(int i = 0; i < MaxNumberOfTypes; i++)
     {
         fgets(strtemp, MAX_LENGTH_OF_STRING, fTimesOfDrying);
         char * typeTemp = strtok(strtemp, sep);
         strtok(NULL, sep);
         int timeOfDryingTemp = (int)(*strtok(NULL, sep));
-        for(int i = 0; i < MAX_NUMBER_OF_TYPES; i++)
+        for(int i = 0; i < MaxNumberOfTypes; i++)
         {
             if(strcmp(massOfThings[i].type, typeTemp) == 0)
             {
@@ -128,7 +127,7 @@ void FillTimesOfDrying(thing * massOfThings)
 void dry(thing * massOfThings, char * typeTemp)
 {
     int timeOfDryingTemp = 0;
-    for(int i = 0; i < MAX_NUMBER_OF_TYPES; i++)
+    for(int i = 0; i < MaxNumberOfTypes; i++)
     {
         if(strcmp(massOfThings[i].type, typeTemp) == 0)
         {
@@ -142,7 +141,7 @@ void dry(thing * massOfThings, char * typeTemp)
 void clean(thing * massOfThings, char * typeTemp)
 {
     int timeOfCleaningTemp = 0;
-    for(int i = 0; i < MAX_NUMBER_OF_TYPES; i++)
+    for(int i = 0; i < MaxNumberOfTypes; i++)
     {
         if(strcmp(massOfThings[i].type, typeTemp) == 0)
         {
@@ -158,10 +157,10 @@ char ** createMassToClean()
 {
     char sep[2] = " ";
     FILE * fNumber = fopen("/home/ivan/Рабочий стол/фртк/all/Table/Table/number", "r");
-    char ** massOfThingsToClean = malloc(MAX_NUMBER_OF_THINGS * sizeof(char*));
+    char ** massOfThingsToClean = malloc(MaxNumberOfThings * sizeof(char*));
 
     int count = 0;
-    while(count < MAX_NUMBER_OF_THINGS)
+    while(count < MaxNumberOfThings)
     {
         char * strtemp = malloc(MAX_LENGTH_OF_STRING * sizeof(char));
         if(fgets(strtemp, MAX_LENGTH_OF_STRING, fNumber) == NULL)
@@ -191,7 +190,7 @@ void childClean(thing * myMassOfThings, int fd, int * thingsOnTheTable, int semi
 
     printf("\n");
     printf("queue to be cleaned\n");
-    for(int i = 0; i < MAX_NUMBER_OF_THINGS; i++)
+    for(int i = 0; i < MaxNumberOfThings; i++)
     {
         printf("%s\n", massOfThingsToClean[i]);
     }
@@ -201,7 +200,7 @@ void childClean(thing * myMassOfThings, int fd, int * thingsOnTheTable, int semi
 
     unlockSem(semid);
 
-    while(i < MAX_NUMBER_OF_THINGS)
+    while(i < MaxNumberOfThings)
     {
         if ((*thingsOnTheTable) <= TABLE_LIMIT)
         {
@@ -275,14 +274,58 @@ int * createShearedMemory()
     return ptrRes;
 }
 
+void getNumberOfTypes(int * number)
+{
+    FILE * fTimesOfCleaning = fopen("/home/ivan/Рабочий стол/фртк/all/Table/Table/timesofcleaning", "r");
+    int res = 0;
+
+    char strtemp[MAX_LENGTH_OF_STRING];
+    for(int i = 0; i < *number; i++)
+    {
+        if(fgets(strtemp, MAX_LENGTH_OF_STRING, fTimesOfCleaning) != NULL)
+            res++;
+    }
+    fclose(fTimesOfCleaning);
+    *number = res;
+}
+
+void getMaxNumberOfThings(int * number)
+{
+    char sep[] = " ";
+    int res = 0;
+    FILE * fNumber = fopen("/home/ivan/Рабочий стол/фртк/all/Table/Table/number", "r");
+
+    char strtemp[MAX_LENGTH_OF_STRING];
+    for(int i = 0; i < *number; i++)
+    {
+        if(fgets(strtemp, MAX_LENGTH_OF_STRING, fNumber) == NULL)
+        {
+            fclose(fNumber);
+            break;
+        }
+        strtok(strtemp, sep);
+        strtok(NULL, sep);
+        res += ((int)(*strtok(NULL, sep)) - 48);
+    }
+    *number = res;
+    fclose(fNumber);
+
+}
 
 int main()
 {
+    getNumberOfTypes(&MaxNumberOfTypes);
+    printf("MaxNumberOfTypes = %d\n", MaxNumberOfTypes);
+
+    getMaxNumberOfThings(&MaxNumberOfThings);
+    printf("MaxNumberOfThings = %d\n", MaxNumberOfThings);
+
+
     thing * myMassOfThings = cleateMassOfThingsAndFillTimesOfCleaning();
     FillTimesOfDrying(myMassOfThings);
 
     printf("FILE:\n");
-    for(int i = 0; i < MAX_NUMBER_OF_TYPES; i++)
+    for(int i = 0; i < MaxNumberOfTypes; i++)
     {
         printf("[%d]%s clean:%d dry:%d \n", i, myMassOfThings[i].type, myMassOfThings[i].timeOfCleaning,
                myMassOfThings[i].timeOfDrying);
@@ -304,12 +347,10 @@ int main()
     if (pid == 0)
     {//родитель вытирает
         perentDry(myMassOfThings, fd[0], ptrRes, semid);
-        printf("hehedryer\n");
     }
     else
     {//ребенок моет
         childClean(myMassOfThings, fd[1], ptrRes, semid);
-        printf("hehecleaner\n");
     }
 
     //free(myMassOfThings);//щто?
