@@ -30,6 +30,12 @@ void *ThreadCountAverage(void *AcceptedPart)
 
     ThisPart.sum = sum;
 
+    //printf("==ThisPart.begin = %d\n", ThisPart.begin);
+    //printf("==ThisPart.end = %d\n", ThisPart.end);
+    //printf("==ThisPart.data = %d\n", ThisPart.data);
+    //printf("==ThisPart.sum = %d\n", ThisPart.sum);
+
+    //printf("==ThisPart.end - ThisPart.begin = %d\n", ThisPart.end - ThisPart.begin);
     *(OnePart*)AcceptedPart = ThisPart;
     return NULL;
 }
@@ -46,6 +52,12 @@ void *MyThreadCountDispersion(void *AcceptedPart)
     {
         ThisPart.dispersion = ThisPart.dispersion + (float)((ThisPart.data[i] - ThisPart.average) * (ThisPart.data[i] - ThisPart.average));
     }
+
+    //printf("==ThisPart.begin = %d\n", ThisPart.begin);
+    //printf("==ThisPart.end = %d\n", ThisPart.end);
+    //printf("==ThisPart.data = %d\n", ThisPart.data);
+    //printf("==ThisPart.sum = %d\n", ThisPart.sum);
+    //printf("==ThisPart.dispersion = %f\n", ThisPart.dispersion);
 
     *(OnePart*)AcceptedPart = ThisPart;
     return NULL;
@@ -86,25 +98,33 @@ int main()
     pthread_t * thids = malloc(NumberOfThr * sizeof(pthread_t));
 
 
-    clock_t begin = clock();
+    double start = time(NULL);
 
-    for (int i = 0; i < NumberOfThr; i++)
+    for(int r = 0; r < 40; r++)
     {
-        int res = pthread_create( &thids[i], (pthread_attr_t *)NULL, ThreadCountAverage, &Parts[i]);
+
+        for (int i = 0; i < NumberOfThr; i++)
+        {
+            int res = pthread_create( &thids[i], (pthread_attr_t *)NULL, ThreadCountAverage, &Parts[i]);
+        }
+
+        for (int i = 0; i < NumberOfThr; i++)
+        {
+            pthread_join(thids[i], (void **)NULL);
+        }
     }
+    double end = time(NULL);
 
-    printf("thread");
+    printf("Took %lf seconds to execute it\n", difftime(end, start) / 40);
 
-    for (int i = 0; i < NumberOfThr; i++)
+
+    /*for (int i = 0; i < NumberOfThr; i++)
     {
-        pthread_join(thids[i], (void **)NULL);
-    }
-
-    clock_t end = clock();
-    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-
-    printf("time_spent = %lf", time_spent * 1000);
-
+        printf("Parts[%d].begin = %d\n", i, Parts[i].begin);
+        printf("Parts[%d].end = %d\n", i, Parts[i].end);
+        printf("Parts[%d].data = %d\n", i, Parts[i].data);
+        printf("Parts[%d].sum = %d\n", i, Parts[i].sum);
+    }*/
 
     for (int i = 0; i < NumberOfThr; i++)
     {
@@ -113,6 +133,8 @@ int main()
     average = sum / DIGITS;
 
     printf("\n");
+    //printf("sum = %f\n", sum);
+    //printf("average = %f\n", average);
 
     for (int i = 0; i < NumberOfThr; i++)
     {
