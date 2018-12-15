@@ -7,6 +7,34 @@
 #include <string.h>
 #define BUF 50
 
+
+void start(int fd1, int fd2, char * name1, char * name2)
+{
+    int pid = fork();
+    char * str = (char*)calloc(BUF, sizeof(char));
+
+    if (pid == 0)
+    {
+        fd2 = open(name2, O_RDONLY);
+        while(1)
+        {
+            read(fd2, str, BUF);
+            printf("2: ");
+            puts(str);
+
+        }
+    }
+    else
+    {
+        fd1 = open(name1, O_WRONLY);
+        while(1)
+        {
+            scanf("%s", str);
+            write(fd1, str, BUF);
+        }
+    }
+}
+
 int main()
 {
     int     fd1, fd2, result;
@@ -43,66 +71,14 @@ int main()
 
 
 
-    if (numberOfConsole == 1)// ////////////////////////
+    if (numberOfConsole == 1)
     {
-        pid = fork();
-
-
-        if (pid == 0)
-        {
-            fd2 = open(name2, O_RDONLY);
-            while(1)
-            {
-                read(fd2, str, BUF);
-                if (size < 0)
-                {
-                    printf("O NEET");
-                }
-                printf("2: ");
-                puts(str);
-
-            }
-        }
-        else
-        {
-            fd1 = open(name1, O_WRONLY);
-            while(1)
-            {
-                scanf("%s", str);
-                write(fd1, str, BUF);
-            }
-        }
+        start(fd1, fd2, name1, name2);
     }
 
-    if (numberOfConsole == 2)// /////////////////////////////////
+    if (numberOfConsole == 2)
     {
-        pid = fork();
-
-
-        if (pid == 0)
-        {
-            fd1 = open(name1, O_RDONLY);
-            while(1)
-            {
-                size = read(fd1, str, BUF);
-                if(size < 0)
-                {
-                    printf("O NEEET");
-                }
-                printf("1: ");
-                puts(str);
-
-            }
-        }
-        else
-        {
-            fd2 = open(name2, O_WRONLY);
-            while (1)
-            {
-                scanf("%s", str);
-                write(fd2, str, BUF);
-            }
-        }
+        start(fd2, fd1, name2, name1);
     }
 
     return 0;
